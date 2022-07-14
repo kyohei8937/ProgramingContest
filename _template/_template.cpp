@@ -14,9 +14,9 @@ const int MOD = 1000000007;
 #define DEBUG_ON
 #ifdef DEBUG_ON
 # define _printf(...)  printf(__VA_ARGS__);                   
-# define _LOG(...)     printf("[%d]:", __LINE__), printf(__VA_ARGS__)
+# define _LOG(...)     printf("[%d]:", __LINE__), printf(__VA_ARGS__), printf("\n");
 #else
-# define _printf(fmt, ...)
+# define _printf(...) 
 # define _LOG(...)
 #endif
 
