@@ -34,82 +34,75 @@ int LCM(int a, int b) { return a * b / GCD(a, b); }
 //============================================================================
 //ここまでテンプレ
 //============================================================================
-int H, W;
-int rs, cs, rt, ct;
-int S[1002][1002];
-//vector<int> A,B;
-
 #ifndef RANDOM_CHECK
+const int N_MAX = 100000;
+int N;
+vector<int> children[N_MAX];
 
-int dir_r[4] = { -1,0,1,0 };
-int dir_c[4] = { 0,1,0,-1 };
+int hashi;
+int max_score;
 
+vector<int> gusu;
+vector<int> kisu;
 
-void solve() {
-
-    queue<pair<pair<int, int>, int>> bfs;
-    pair<int, int> src_pos = make_pair(rs, cs);
-    pair<int, int> tar_pos = make_pair(rt, ct);
-
-    bfs.push(make_pair(src_pos, -1));
-
-    int ans = INF;
-    while (!bfs.empty()) {
-        pair<pair<int, int>, int> cur = bfs.front();
-        bfs.pop();
-
-        int curCnt = S[cur.first.first][cur.first.second];
-        bool isGoal = false;
-        rep(dir, 4) {
-            pair<int, int> nxtPos = cur.first;
-            nxtPos.first += dir_r[dir];
-            nxtPos.second += dir_c[dir];
-            // 壁の場合はスキップ
-            if (S[nxtPos.first][nxtPos.second] == -1) {
-                continue;
+// 再帰関数による実装
+void dfs(int current, int prev, int score) {
+    for (int next : children[current]) {
+        if (next != prev) {
+            if (max_score < score) {
+                hashi = next;
+                max_score = score;
             }
-
-            int nxtCnt = curCnt;
-            if (dir != cur.second) {
-                nxtCnt++;
-            }
-
-            // ゴール到達
-            if (nxtPos == tar_pos) {
-                isGoal = true;
-                ChMin(ans, nxtCnt);
-                continue;
-            }
-
-            if ((S[nxtPos.first][nxtPos.second] == 0) || 
-                (nxtCnt <= S[nxtPos.first][nxtPos.second])) {
-                bfs.push(make_pair(nxtPos, dir));
-                S[nxtPos.first][nxtPos.second] = nxtCnt;
-            }
+            dfs(next, current, score + 1);
         }
-        if (isGoal) break;
     }
-    cout << ans-1 << endl;
-    return;
+}
+
+// 再帰関数による実装
+void dfs2(int current, int prev, int score) {
+    for (int next : children[current]) {
+        if (next != prev) {
+            if (score % 2 == 0) {
+                gusu.push_back(next);
+            }
+            else {
+                kisu.push_back(next);
+            }
+            dfs2(next, current, score + 1);
+        }
+    }
 }
 
 signed main() {
-    cin >> H >> W >> rs >> cs >> rt >> ct;
-    rep(i, 1002) {
-        rep(j, 1002) {
-            S[i][j] = -1;
+    // 標準入力
+    cin >> N;
+    int start = 0;
+    rep(i, N - 1) {
+        int a, b;
+        cin >> a >> b;
+        a--; b--;
+        children[a].push_back(b);
+        children[b].push_back(a);
+        start = a;
+    }
+    dfs(start, -1, 1);
+    int hashi1 = hashi;
+    max_score = 0;
+    gusu.push_back(hashi1);
+    dfs2(hashi1, -1, 1);
+
+    vector<int> ans = gusu;
+    if(kisu.size() >= gusu.size()) {
+        ans = kisu;
+    }
+    rep(i, N/2) {
+        cout << ans[i]+1;
+        if (i != ans.size() - 1) {
+            cout << " ";
         }
     }
-    rep(i, H) {
-        rep(j, W) {
-            char c;
-            cin >> c;
-            if (c == '.') {
-                S[i + 1][j + 1] = 0;
-            }
-        }
-    }
-    solve();
+    cout << endl;
+
     return 0;
 }
 #else // RANDOM_CHECK

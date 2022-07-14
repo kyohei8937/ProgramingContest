@@ -23,14 +23,27 @@ int modpow(int a, int n, int mod) {int res = 1;while (n > 0) {if (n & 1) res = r
 //ここまでテンプレ
 //============================================================================
 
-int N;
+int S,T,X;
 
 void solve(){
+
+    if(S>T){
+        T += 24;
+    }
+    if(S>X){
+        X += 24;
+    }
+    if(S<=X && X < T){
+        cout << "Yes" << endl;
+    }else{
+        cout << "No" << endl;
+    }
+
     return;
 }
 
 signed main(){
-    cin >> N;
+    cin >> S >> T >> X;
     solve();
     return 0;
 }

@@ -35,80 +35,73 @@ int LCM(int a, int b) { return a * b / GCD(a, b); }
 //ここまでテンプレ
 //============================================================================
 int H, W;
-int rs, cs, rt, ct;
-int S[1002][1002];
-//vector<int> A,B;
+char mp[18][18];
+
+int dir_y[4] = { -1,0,1,0 };
+int dir_x[4] = { 0,1,0,-1 };
 
 #ifndef RANDOM_CHECK
-
-int dir_r[4] = { -1,0,1,0 };
-int dir_c[4] = { 0,1,0,-1 };
-
-
 void solve() {
-
-    queue<pair<pair<int, int>, int>> bfs;
-    pair<int, int> src_pos = make_pair(rs, cs);
-    pair<int, int> tar_pos = make_pair(rt, ct);
-
-    bfs.push(make_pair(src_pos, -1));
-
-    int ans = INF;
-    while (!bfs.empty()) {
-        pair<pair<int, int>, int> cur = bfs.front();
-        bfs.pop();
-
-        int curCnt = S[cur.first.first][cur.first.second];
-        bool isGoal = false;
-        rep(dir, 4) {
-            pair<int, int> nxtPos = cur.first;
-            nxtPos.first += dir_r[dir];
-            nxtPos.second += dir_c[dir];
-            // 壁の場合はスキップ
-            if (S[nxtPos.first][nxtPos.second] == -1) {
+    int ans = -1;
+    rep(i, H) {
+        rep(j, W) {
+            if (mp[i+1][j+1] == '#') {
                 continue;
             }
+            queue<pair<pair<int, int>, map<pair<int, int>, int>>> bfs;
+            pair<int, int> start = make_pair(i+1,j+1);
+            map<pair<int, int>,int> keiro;
+            bfs.push(make_pair(start,keiro));
+            while (!bfs.empty()) {
+                pair< pair<int, int>, map<pair<int, int>, int>> cur = bfs.front();
+                bfs.pop();
+                rep(dir, 4) {
+                    pair<int, int> nxt_pos = cur.first;
+                    nxt_pos.first += dir_y[dir];
+                    nxt_pos.second += dir_x[dir];
 
-            int nxtCnt = curCnt;
-            if (dir != cur.second) {
-                nxtCnt++;
-            }
+                    map<pair<int, int>, int> nxt_keiro = cur.second;
 
-            // ゴール到達
-            if (nxtPos == tar_pos) {
-                isGoal = true;
-                ChMin(ans, nxtCnt);
-                continue;
-            }
-
-            if ((S[nxtPos.first][nxtPos.second] == 0) || 
-                (nxtCnt <= S[nxtPos.first][nxtPos.second])) {
-                bfs.push(make_pair(nxtPos, dir));
-                S[nxtPos.first][nxtPos.second] = nxtCnt;
+                    if (nxt_pos == start) {
+                        if (nxt_keiro.size() >= 2) {
+                            ChMax(ans,(int)nxt_keiro.size()+1);
+                        }
+                        continue;
+                    }
+                    auto itr = nxt_keiro.find(nxt_pos);
+                    if (itr == nxt_keiro.end() && mp[nxt_pos.first][nxt_pos.second] == '.') {
+                        nxt_keiro[nxt_pos] = 1;
+                        bfs.push(make_pair(nxt_pos, nxt_keiro));
+                    }
+                }
             }
         }
-        if (isGoal) break;
     }
-    cout << ans-1 << endl;
+
+    cout << ans << endl;
     return;
 }
 
 signed main() {
-    cin >> H >> W >> rs >> cs >> rt >> ct;
-    rep(i, 1002) {
-        rep(j, 1002) {
-            S[i][j] = -1;
+    cin >> H >> W;
+    rep(i, H+2) {
+        rep(j, W+2) {
+            mp[i][j] = '#';
         }
     }
     rep(i, H) {
         rep(j, W) {
-            char c;
-            cin >> c;
-            if (c == '.') {
-                S[i + 1][j + 1] = 0;
-            }
+            cin >> mp[i+1][j+1];
         }
     }
+    /*
+    A.resize(N);
+    B.resize(N);
+    rep(i,N){
+        cin >> A[i];
+        cin >> B[i];
+    }
+    */
     solve();
     return 0;
 }

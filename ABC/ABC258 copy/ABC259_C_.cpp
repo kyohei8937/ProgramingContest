@@ -34,81 +34,73 @@ int LCM(int a, int b) { return a * b / GCD(a, b); }
 //============================================================================
 //ここまでテンプレ
 //============================================================================
-int H, W;
-int rs, cs, rt, ct;
-int S[1002][1002];
+string S, T;
 //vector<int> A,B;
 
 #ifndef RANDOM_CHECK
-
-int dir_r[4] = { -1,0,1,0 };
-int dir_c[4] = { 0,1,0,-1 };
-
-
 void solve() {
+    vector<pair<char, int>> S_Ary;
+    vector<pair<char, int>> T_Ary;
 
-    queue<pair<pair<int, int>, int>> bfs;
-    pair<int, int> src_pos = make_pair(rs, cs);
-    pair<int, int> tar_pos = make_pair(rt, ct);
+    char curMoji = S[0];
+    int mojiCnt = 1;
+    rep2(i, 1, S.size()) {
+        if (S[i] != S[i - 1]) {
+            S_Ary.push_back(make_pair(curMoji, mojiCnt));
+            curMoji = S[i];
+            mojiCnt = 1;
+        }
+        else {
+            mojiCnt++;
+        }
+    }
+    S_Ary.push_back(make_pair(curMoji, mojiCnt));
 
-    bfs.push(make_pair(src_pos, -1));
+    curMoji = T[0];
+    mojiCnt = 1;
+    rep2(i, 1, T.size()) {
+        if (T[i] != T[i - 1]) {
+            T_Ary.push_back(make_pair(curMoji, mojiCnt));
+            curMoji = T[i];
+            mojiCnt = 1;
+        }
+        else {
+            mojiCnt++;
+        }
+    }
+    T_Ary.push_back(make_pair(curMoji, mojiCnt));
 
-    int ans = INF;
-    while (!bfs.empty()) {
-        pair<pair<int, int>, int> cur = bfs.front();
-        bfs.pop();
-
-        int curCnt = S[cur.first.first][cur.first.second];
-        bool isGoal = false;
-        rep(dir, 4) {
-            pair<int, int> nxtPos = cur.first;
-            nxtPos.first += dir_r[dir];
-            nxtPos.second += dir_c[dir];
-            // 壁の場合はスキップ
-            if (S[nxtPos.first][nxtPos.second] == -1) {
-                continue;
+    if (S_Ary.size() != T_Ary.size()) {
+        cout << "No" << endl;
+        return;
+    }
+    else {
+        rep(i, S_Ary.size()) {
+            if (S_Ary[i].first != T_Ary[i].first) {
+                cout << "No" << endl;
+                return;
             }
-
-            int nxtCnt = curCnt;
-            if (dir != cur.second) {
-                nxtCnt++;
+            if (S_Ary[i].second == 1 && T_Ary[i].second != 1) {
+                cout << "No" << endl;
+                return;
             }
-
-            // ゴール到達
-            if (nxtPos == tar_pos) {
-                isGoal = true;
-                ChMin(ans, nxtCnt);
-                continue;
+            else if (S_Ary[i].second != 1 && T_Ary[i].second == 1) {
+                cout << "No" << endl;
+                return;
             }
-
-            if ((S[nxtPos.first][nxtPos.second] == 0) || 
-                (nxtCnt <= S[nxtPos.first][nxtPos.second])) {
-                bfs.push(make_pair(nxtPos, dir));
-                S[nxtPos.first][nxtPos.second] = nxtCnt;
+            else if (S_Ary[i].second  > T_Ary[i].second) {
+                cout << "No" << endl;
+                return;
             }
         }
-        if (isGoal) break;
+        cout << "Yes" << endl;
+        return;
     }
-    cout << ans-1 << endl;
     return;
 }
 
 signed main() {
-    cin >> H >> W >> rs >> cs >> rt >> ct;
-    rep(i, 1002) {
-        rep(j, 1002) {
-            S[i][j] = -1;
-        }
-    }
-    rep(i, H) {
-        rep(j, W) {
-            char c;
-            cin >> c;
-            if (c == '.') {
-                S[i + 1][j + 1] = 0;
-            }
-        }
-    }
+    cin >> S >> T;
     solve();
     return 0;
 }

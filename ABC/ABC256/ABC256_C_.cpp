@@ -34,81 +34,37 @@ int LCM(int a, int b) { return a * b / GCD(a, b); }
 //============================================================================
 //ここまでテンプレ
 //============================================================================
-int H, W;
-int rs, cs, rt, ct;
-int S[1002][1002];
-//vector<int> A,B;
-
+int h[3], w[3];
+int M[3][3];
 #ifndef RANDOM_CHECK
-
-int dir_r[4] = { -1,0,1,0 };
-int dir_c[4] = { 0,1,0,-1 };
-
-
 void solve() {
-
-    queue<pair<pair<int, int>, int>> bfs;
-    pair<int, int> src_pos = make_pair(rs, cs);
-    pair<int, int> tar_pos = make_pair(rt, ct);
-
-    bfs.push(make_pair(src_pos, -1));
-
-    int ans = INF;
-    while (!bfs.empty()) {
-        pair<pair<int, int>, int> cur = bfs.front();
-        bfs.pop();
-
-        int curCnt = S[cur.first.first][cur.first.second];
-        bool isGoal = false;
-        rep(dir, 4) {
-            pair<int, int> nxtPos = cur.first;
-            nxtPos.first += dir_r[dir];
-            nxtPos.second += dir_c[dir];
-            // 壁の場合はスキップ
-            if (S[nxtPos.first][nxtPos.second] == -1) {
-                continue;
-            }
-
-            int nxtCnt = curCnt;
-            if (dir != cur.second) {
-                nxtCnt++;
-            }
-
-            // ゴール到達
-            if (nxtPos == tar_pos) {
-                isGoal = true;
-                ChMin(ans, nxtCnt);
-                continue;
-            }
-
-            if ((S[nxtPos.first][nxtPos.second] == 0) || 
-                (nxtCnt <= S[nxtPos.first][nxtPos.second])) {
-                bfs.push(make_pair(nxtPos, dir));
-                S[nxtPos.first][nxtPos.second] = nxtCnt;
+    int ans = 0;
+    for (int M11 = 1; M11 <= 28; M11++) {
+        for (int M12 = 1; M12 <= 28; M12++) {
+            for (int M21 = 1; M21 <= 28; M21++) {
+                for (int M22 = 1; M22 <= 28; M22++) {
+                    int M13 = h[0] - (M11 + M12);
+                    int M23 = h[1] - (M21 + M22);
+                    int M31 = w[0] - (M11 + M21);
+                    int M32 = w[1] - (M12 + M22);
+                    if(M13 <= 0 || M23 <= 0 || M31 <= 0 || M32 <= 0) {
+                        continue;
+                    }
+                    int M33_1 = h[2] - (M31 + M32);
+                    int M33_2 = w[2] - (M13 + M23);
+                    if (M33_1 == M33_2) {
+                        ans++;
+                    }
+                }
             }
         }
-        if (isGoal) break;
     }
-    cout << ans-1 << endl;
+    cout << ans << endl;
     return;
 }
 
 signed main() {
-    cin >> H >> W >> rs >> cs >> rt >> ct;
-    rep(i, 1002) {
-        rep(j, 1002) {
-            S[i][j] = -1;
-        }
-    }
-    rep(i, H) {
-        rep(j, W) {
-            char c;
-            cin >> c;
-            if (c == '.') {
-                S[i + 1][j + 1] = 0;
-            }
-        }
-    }
+    cin >> h[0] >> h[1] >> h[2] >> w[0] >> w[1] >> w[2];
     solve();
     return 0;
 }

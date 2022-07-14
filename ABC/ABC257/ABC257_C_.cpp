@@ -34,82 +34,73 @@ int LCM(int a, int b) { return a * b / GCD(a, b); }
 //============================================================================
 //ここまでテンプレ
 //============================================================================
-int H, W;
-int rs, cs, rt, ct;
-int S[1002][1002];
-//vector<int> A,B;
+int N;
+string S;
+vector<int> W1,W2;
+
+int dp[2][200100];
 
 #ifndef RANDOM_CHECK
-
-int dir_r[4] = { -1,0,1,0 };
-int dir_c[4] = { 0,1,0,-1 };
-
-
-void solve() {
-
-    queue<pair<pair<int, int>, int>> bfs;
-    pair<int, int> src_pos = make_pair(rs, cs);
-    pair<int, int> tar_pos = make_pair(rt, ct);
-
-    bfs.push(make_pair(src_pos, -1));
-
-    int ans = INF;
-    while (!bfs.empty()) {
-        pair<pair<int, int>, int> cur = bfs.front();
-        bfs.pop();
-
-        int curCnt = S[cur.first.first][cur.first.second];
-        bool isGoal = false;
-        rep(dir, 4) {
-            pair<int, int> nxtPos = cur.first;
-            nxtPos.first += dir_r[dir];
-            nxtPos.second += dir_c[dir];
-            // 壁の場合はスキップ
-            if (S[nxtPos.first][nxtPos.second] == -1) {
-                continue;
-            }
-
-            int nxtCnt = curCnt;
-            if (dir != cur.second) {
-                nxtCnt++;
-            }
-
-            // ゴール到達
-            if (nxtPos == tar_pos) {
-                isGoal = true;
-                ChMin(ans, nxtCnt);
-                continue;
-            }
-
-            if ((S[nxtPos.first][nxtPos.second] == 0) || 
-                (nxtCnt <= S[nxtPos.first][nxtPos.second])) {
-                bfs.push(make_pair(nxtPos, dir));
-                S[nxtPos.first][nxtPos.second] = nxtCnt;
-            }
-        }
-        if (isGoal) break;
+int solve() {
+    int ans = 0;
+    if (W1.size() == N || W2.size() == N) {
+        return N;
     }
-    cout << ans-1 << endl;
-    return;
+
+    ans = max(W1.size(),W2.size());
+    
+    rep(i, W1.size()) {
+        auto it = lower_bound(ALL(W2), W1[i]);
+        if (it != W2.end()) {
+            int index = it - W2.begin();
+            int otona = W1.size() - i;
+            int kodomo = index;
+            int newAns = otona + kodomo;
+            ans = max(ans, newAns);
+        }
+        else {
+            int otona = W1.size() - i;
+            int kodomo = W2.size();
+            int newAns = otona + kodomo;
+            ans = max(ans, newAns);
+        }
+    }
+    
+    rep(i, W2.size()) {
+        auto it = lower_bound(ALL(W1), W2[i] + 1);
+        if (it != W1.end()) {
+            int index = it - W1.begin();
+            int kodomo = i;
+            int otona = W1.size()-index;
+            int newAns = otona + kodomo;
+            ans = max(ans, newAns);
+        }
+        else {
+            int otona = 0;
+            int kodomo = W2.size()-i;
+            int newAns = otona + kodomo;
+            ans = max(ans, newAns);
+        }
+    }
+
+    return ans;
 }
 
 signed main() {
-    cin >> H >> W >> rs >> cs >> rt >> ct;
-    rep(i, 1002) {
-        rep(j, 1002) {
-            S[i][j] = -1;
+    cin >> N >> S;
+    rep(i,N){
+        int w;
+        cin >> w;
+        if (S[i] == '1') {
+            W1.push_back(w);
+        }
+        else {
+            W2.push_back(w);
         }
     }
-    rep(i, H) {
-        rep(j, W) {
-            char c;
-            cin >> c;
-            if (c == '.') {
-                S[i + 1][j + 1] = 0;
-            }
-        }
-    }
-    solve();
+    sort(ALL(W1));
+    sort(ALL(W2));
+    cout << solve() << endl;;
     return 0;
 }
 #else // RANDOM_CHECK
