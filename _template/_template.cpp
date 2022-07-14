@@ -11,11 +11,13 @@ const int MOD = 1000000007;
 #define ALL(x) (x).begin(),(x).end()
 
 //#define RANDOM_CHECK
-#define DEBUG
-#ifdef DEBUG
-# define _printf(fmt, ...)  printf(fmt, __VA_ARGS__);                   
+#define DEBUG_ON
+#ifdef DEBUG_ON
+# define _printf(...)  printf(__VA_ARGS__);                   
+# define _LOG(...)     printf("[%d]:", __LINE__), printf(__VA_ARGS__)
 #else
 # define _printf(fmt, ...)
+# define _LOG(...)
 #endif
 
 // 便利関数
